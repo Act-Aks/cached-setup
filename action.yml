@@ -2,10 +2,6 @@ name: "Node.js Dependencies Cache Setup"
 description: "Setup Node.js environment and efficiently cache dependencies with Yarn"
 author: "Act-Aks"
 
-branding:
-  icon: "package"
-  color: "purple"
-
 inputs:
   node-version-file:
     description: "Path to the .nvmrc file"
@@ -20,6 +16,10 @@ outputs:
   cache-hit:
     description: "Indicates if a cache hit occurred"
     value: ${{ steps.yarn-cache.outputs.cache-hit }}
+
+branding:
+  icon: "package"
+  color: "purple"
 
 runs:
   using: composite
