@@ -1,0 +1,56 @@
+name: "Node.js Dependencies Cache Setup"
+description: "Setup Node.js environment and efficiently cache dependencies with Yarn"
+author: "Act-Aks"
+
+branding:
+  icon: "package"
+  color: "purple"
+
+inputs:
+  node-version-file:
+    description: "Path to the .nvmrc file"
+    required: false
+    default: ".nvmrc"
+  cache-prefix:
+    description: "Custom prefix for cache keys"
+    required: false
+    default: ""
+
+outputs:
+  cache-hit:
+    description: "Indicates if a cache hit occurred"
+    value: ${{ steps.yarn-cache.outputs.cache-hit }}
+
+runs:
+  using: composite
+  steps:
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version-file: .nvmrc
+
+    - name: Restore dependencies
+      id: yarn-cache
+      uses: actions/cache/restore@v4
+      with:
+        path: |
+          **/node_modules
+          .yarn/install-state.gz
+        key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}-${{ hashFiles('**/package.json', '!node_modules/**') }}
+        restore-keys: |
+          ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
+          ${{ runner.os }}-yarn-
+
+    - name: Install dependencies
+      if: steps.yarn-cache.outputs.cache-hit != 'true'
+      run: yarn install --immutable
+      shell: bash
+
+    - name: Cache dependencies
+      if: steps.yarn-cache.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v4
+      with:
+        path: |
+          **/node_modules
+          .yarn/install-state.gz
+        key: ${{ steps.yarn-cache.outputs.cache-primary-key }}
