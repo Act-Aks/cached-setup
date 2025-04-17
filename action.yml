@@ -11,6 +11,10 @@ inputs:
     description: "Custom prefix for cache keys"
     required: false
     default: ""
+  registry-url:
+    description: "Custom registry URL"
+    required: false
+    default: "https://registry.npmjs.org/"
 
 outputs:
   cache-hit:
@@ -28,6 +32,7 @@ runs:
       uses: actions/setup-node@v4
       with:
         node-version-file: .nvmrc
+        registry-url: ${{ inputs.registry-url }}
 
     - name: Restore dependencies
       id: yarn-cache
